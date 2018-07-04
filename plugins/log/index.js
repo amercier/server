@@ -1,15 +1,4 @@
-const Log = require('log');
-
-const valid = [
-  'emergency',
-  'alert',
-  'critical',
-  'error',
-  'warning',
-  'notice',
-  'info',
-  'debug'
-];
+const { Log, defaultOptions } = require('hiplog');
 
 // Log plugin
 const plugin = {
@@ -17,16 +6,37 @@ const plugin = {
   options: {
     __root: 'level',
     level: {
-      default: 'info',
       type: String,
-      enum: valid
+      default: defaultOptions.level,
+      enum: defaultOptions.levels,
+      env: 'LOG_LEVEL'
     },
-    report: {
-      default: process.stdout
-    }
+    displayTime: {
+      type: Boolean,
+      default: defaultOptions.displayTime,
+      env: 'LOG_TIME'
+    },
+    displayTimeFormat: {
+      type: String,
+      default: defaultOptions.displayTimeFormat,
+      env: 'LOG_TIME_FORMAT'
+    },
+    separator: {
+      type: String,
+      default: defaultOptions.separator,
+      env: 'LOG_SEPARATOR'
+    },
+    stream: {
+      validate: value => ['object', 'function'].indexOf(typeof value) !== -1,
+      default: defaultOptions.stream
+    },
+    format: {
+      type: Function,
+      default: defaultOptions.format
+    },
   },
   init: ctx => {
-    ctx.log = new Log(ctx.options.log.level, ctx.options.log.report);
+    ctx.log = new Log(ctx.options.log);
   }
 };
 
